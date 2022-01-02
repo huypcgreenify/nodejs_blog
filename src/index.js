@@ -15,6 +15,14 @@ app.use(express.static(path.join(__dirname, './public')))
 //HTTP logger
 app.use(morgan('dev'))
 
+//middleware xử lí gửi dữ liệu từ form
+app.use(express.urlencoded({
+  extended: true
+}))
+
+//middleware xử lí gửi dữ liệu từ js
+app.use(express.json())
+
 //Template engine
 app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs');
@@ -27,7 +35,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/news', (req, res) => {
+  console.log('news: ' + req.query.q)
   res.render('news')
+})
+
+app.get('/search', (req, res) => {
+  console.log(req.query.q)
+  res.render('search')
+})
+
+app.post('/search', (req, res) => {
+
+  console.log('post search: ' + JSON.stringify(req.body))
+
+  res.send('')
 })
 
 //Server local
