@@ -1,14 +1,21 @@
 const express = require('express')
+
 //Handlebars import
 const handlebars = require('express-handlebars')
 const hbs = handlebars.create({ extname: '.hbs' })
-//
+// end Handlerbars
+
 const morgan = require('morgan')
 const path = require('path')
 
+//Start NodeJS
 const app = express()
 const port = 3000
 
+//Route
+const route = require('./routes')
+
+//----------------------------------------------------
 //Static files
 app.use(express.static(path.join(__dirname, './public')))
 
@@ -29,27 +36,8 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, './resources/views'))
 console.log('PATH: ', path.join(__dirname, './resources/views'))
 
-//Code
-app.get('/', (req, res) => {
-  res.render('home')
-})
-
-app.get('/news', (req, res) => {
-  console.log('news: ' + req.query.q)
-  res.render('news')
-})
-
-app.get('/search', (req, res) => {
-  console.log(req.query.q)
-  res.render('search')
-})
-
-app.post('/search', (req, res) => {
-
-  console.log('post search: ' + JSON.stringify(req.body))
-
-  res.send('')
-})
+//Code route init
+route(app)
 
 //Server local
 app.listen(port, () => {
