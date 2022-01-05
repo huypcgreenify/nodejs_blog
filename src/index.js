@@ -7,18 +7,26 @@ db.connect()
 
 //Handlebars import
 const handlebars = require('express-handlebars')
-const hbs = handlebars.create({ extname: '.hbs' })
+const hbs = handlebars.create({
+  extname: '.hbs',
+  helpers: {
+    sum: (a, b) => a + b,
+  }
+})
 // end Handlerbars
 
 const morgan = require('morgan')
 const path = require('path')
 
+//Route
+const route = require('./routes')
+
+//method override
+const methodOverride = require('method-override')
+
 //Start NodeJS
 const app = express()
 const port = 3000
-
-//Route
-const route = require('./routes')
 
 //----------------------------------------------------
 //Static files
@@ -34,6 +42,9 @@ app.use(express.urlencoded({
 
 //middleware xử lí gửi dữ liệu từ js
 app.use(express.json())
+
+//method override
+app.use(methodOverride('_method'))
 
 //Template engine
 app.engine('hbs', hbs.engine)
