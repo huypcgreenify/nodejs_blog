@@ -1,10 +1,27 @@
-<div class="mt-4">
+<form class="mt-4" name="container-form" method="POST" action="/courses/handle-form-action">
     <a href="/me/stored/courses">Quay lại danh sách khóa học</a>
     <h3>Khóa học đã xóa</h3>
+    <div class="mt-4 d-flex align-items-center">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+            <label class="form-check-label" for="checkbox-all">
+                Chọn tất cả
+            </label>
+        </div>
+
+        <select class="form-control form-control-sm checkbox-select-all-options" id="selectBox" name="action" required>
+            <option value="">Chọn hành động</option>
+            <option value="restore">Khôi phục</option>
+            <option value="forceDelete" name="forceDelete">Xóa vĩnh viễn</option>
+        </select>
+
+        <button class="btn btn-primary btn-sm check-all-submit-btn" disabled>Thực hiện</button>
+    </div>
     <table class="table mt-4">
         <thead>
             <tr>
                 <th scope="col">#</th>
+                <th scope="col">STT</th>
                 <th scope="col">Tên khóa học</th>
                 <th scope="col">Trình độ</th>
                 <th scope="col">Thời gian xóa</th>
@@ -14,6 +31,11 @@
         <tbody>
             {{#each courses}}
             <tr>
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{this._id}}" name="courseIds[]">
+                    </div>
+                </td>
                 <th scope="row">{{sum @index 1}}</th>
                 <td>{{this.name}}</td>
                 <td>{{this.level}}</td>
@@ -34,7 +56,7 @@
             {{/each}}
         </tbody>
     </table>
-</div>
+</form>
 
 {{!-- Confirm delete course --}}
 <div class="modal" tabindex="-1" id="delete-course-model">
@@ -71,6 +93,12 @@
         var btnDeleteCourse = document.getElementById('btn-delete-course')
         var restoreBtn = $('.btn-restore')
 
+        var checkboxAll = $('#checkbox-all') //id
+        var courseItemCheckbox = $('input[name="courseIds[]"]') // cụm thẻ có name
+        var checkAllSubmitBtn = $('.check-all-submit-btn') //class
+        var containerForm = $('form[name="container-form"]') //name
+        var forceDelete =  $('#selectBox')
+
         //khi hiện dialog sẽ kèm id
         $('#delete-course-model').on('shown.bs.modal', function (event) {
             var button = $(event.relatedTarget)
@@ -93,6 +121,47 @@
             restoreForm.submit()
         })
 
+        //khi ấn checkbox sẽ check hết các thằng con
+        //console.log(checkboxAll)
+        checkboxAll.change(function () {
+            var isCheckedAll = $(this).prop('checked')
+            courseItemCheckbox.prop('checked', isCheckedAll)
+            renderCheckAllSubmitBtn()
+        })
+
+        //khi bỏ 1 checkbox con sẽ bỏ thằng check tất cả
+        courseItemCheckbox.change(function () {
+            var isCheckedAll = courseItemCheckbox.length === $('input[name="courseIds[]"]:checked').length
+            checkboxAll.prop('checked', isCheckedAll)
+            renderCheckAllSubmitBtn()
+        })
+
+
+        //Check tát cả buton sẽ submit submi
+        checkAllSubmitBtn.click('submit', function (e) {
+            var isSubmitted = $(this).hasClass('disabled');
+            if (isSubmitted) {
+                e.preventDefault();
+            }
+        })
+
+        //Nếu check sẽ hiên button thực hiện
+        function renderCheckAllSubmitBtn() {
+            var checkedCount = $('input[name="courseIds[]"]:checked').length
+            if (checkedCount > 0) {
+                checkAllSubmitBtn.attr('disabled', false);
+            } else {
+                checkAllSubmitBtn.attr('disabled', true)
+            }
+        }
+
+       forceDelete.change(function (event) {
+            var valueCheck = forceDelete.val();
+            if (valueCheck == 'forceDelete') {
+                confirm('Hành động này sẽ xóa vĩnh viễn dữ liệu.')
+            }
+        })
+        
     })
 
 
